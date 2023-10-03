@@ -28,6 +28,7 @@ contract Cryptocurrency {
 
     // Function to transfer cryptocurrency to another address
     function transfer(address to, uint256 amount) external {
+        require(to != address(0), "Invalid address");
         require(balances[msg.sender] >= amount, "Insufficient balance.");
         balances[msg.sender] -= amount;
         balances[to] += amount;
@@ -42,16 +43,17 @@ contract Cryptocurrency {
             require(msg.sender == owner, "Condition not met.");
         }
     */
-
         balances[msg.sender] -= amount;
         balances[to] += amount;
     }
 
     // Function to set up an escrow transaction
     function createEscrow(address _seller, uint256 _amount) external payable {
+        require(_seller != address(0), "Invalid address");
         require(!escrowReleased, "Escrow already released.");
         require(balances[msg.sender] >= _amount, "Insufficient balance.");
         require(_amount > 0, "Escrow amount must be greater than 0.");
+
         seller = _seller;
         buyer = msg.sender;
         escrowAmount = _amount;
@@ -62,6 +64,7 @@ contract Cryptocurrency {
     function releaseEscrow() external {
         require(msg.sender == buyer, "Only the buyer can release escrow.");
         require(escrowReleased == false, "Escrow already released.");
+
         balances[seller] += escrowAmount;
         escrowReleased = true;
     }
@@ -70,21 +73,14 @@ contract Cryptocurrency {
     function refundEscrow() external {
         require(msg.sender == seller, "Only the seller can refund escrow.");
         require(escrowReleased == false, "Escrow already released.");
+
         balances[buyer] += escrowAmount;
         escrowReleased = true;
     }
 
-    // Function to check the balance of an address
-    // function getBalance(address account) external view returns (uint256) {
-    //     return balances[account];
-    // }
-
-
-    function getBalance(address user_account) external returns (uint){
-       string memory data = "User Balance is : ";
+    function getBalance(address user_account) external returns (uint){\
        uint user_bal = user_account.balance;
-       emit CheckBalance(data, user_bal );
+       emit CheckBalance(user_bal);
        return (user_bal);
-
     }
 }
